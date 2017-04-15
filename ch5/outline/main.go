@@ -20,7 +20,14 @@ func main() {
 		fmt.Fprintf(os.Stderr, "outline: %v\n", err)
 		os.Exit(1)
 	}
-	outline(nil, doc)
+
+	if len(os.Args) == 2 && os.Args[1] == "-count" {
+		count := map[string]int{}
+		countTags(count, doc)
+		fmt.Println(count)
+	} else {
+		outline(nil, doc)
+	}
 }
 
 func outline(stack []string, n *html.Node) {
@@ -30,6 +37,16 @@ func outline(stack []string, n *html.Node) {
 	}
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
 		outline(stack, c)
+	}
+}
+
+func countTags(count map[string]int, n *html.Node) {
+	if n.Type == html.ElementNode {
+		count[n.Data]++
+	}
+
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		countTags(count, c)
 	}
 }
 
